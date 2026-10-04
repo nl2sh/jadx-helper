@@ -11,7 +11,7 @@ if (-not (Test-Path -LiteralPath $GradleCommand -PathType Leaf)) {
     throw "Gradle Wrapper was not found: $GradleCommand"
 }
 
-& $GradleCommand --project-dir $HelperRoot :app:packageHelper
+& $GradleCommand --no-daemon --project-dir $HelperRoot :app:packageHelper
 if ($LASTEXITCODE -ne 0) { throw "Gradle release build failed" }
 if (-not (Test-Path -LiteralPath $PackagedJar -PathType Leaf)) {
     throw "packaged helper was not found after the Gradle build: $PackagedJar"

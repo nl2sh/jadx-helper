@@ -2,7 +2,7 @@
 set -euo pipefail
 
 helper_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-sh "$helper_root/gradlew" --project-dir "$helper_root" :app:packageHelper
+sh "$helper_root/gradlew" --no-daemon --project-dir "$helper_root" :app:packageHelper
 
 python3 - "$helper_root" <<'PY'
 import hashlib
