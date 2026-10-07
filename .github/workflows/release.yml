@@ -25,11 +25,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Resolve release version
         id: version
-        run: python3 .github/scripts/release-version.py "$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 .github/scripts/release-version.py >> "$GITHUB_OUTPUT"
       - name: Build DEX helper and lint
         run: |
-          ./build-helper.sh -Pnl2shJadxVersionName=${{ steps.version.outputs.version_name }} -Pnl2shJadxVersionCode=${{ steps.version.outputs.version_code }}
-          ./gradlew --no-daemon :app:lintRelease -Pnl2shJadxVersionName=${{ steps.version.outputs.version_name }} -Pnl2shJadxVersionCode=${{ steps.version.outputs.version_code }}
+          ./build-helper.sh -Pnl2shJadxVersionName=${{ steps.version.outputs.version }} -Pnl2shJadxVersionCode=${{ steps.version.outputs.code }}
+          ./gradlew --no-daemon :app:lintRelease -Pnl2shJadxVersionName=${{ steps.version.outputs.version }} -Pnl2shJadxVersionCode=${{ steps.version.outputs.code }}
           (cd dist && sha256sum -c jadx-helper.jar.sha256)
           cp LICENSE THIRD_PARTY_NOTICES.md dist/
           tar -czf dist/third-party-licenses.tar.gz licenses
