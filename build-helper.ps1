@@ -11,7 +11,7 @@ if (-not (Test-Path -LiteralPath $GradleCommand -PathType Leaf)) {
     throw "Gradle Wrapper was not found: $GradleCommand"
 }
 
-& $GradleCommand --no-daemon --project-dir $HelperRoot :app:packageHelper
+& $GradleCommand --no-daemon --project-dir $HelperRoot :app:packageHelper @args
 if ($LASTEXITCODE -ne 0) { throw "Gradle release build failed" }
 if (-not (Test-Path -LiteralPath $PackagedJar -PathType Leaf)) {
     throw "packaged helper was not found after the Gradle build: $PackagedJar"
@@ -45,6 +45,11 @@ function Test-ByteSequence {
 $Archive = $null
 try {
     $Archive = [System.IO.Compression.ZipFile]::OpenRead($Jar)
+    $MetadataEntry = $Archive.GetEntry("assets/nl2sh-runtime.json")
+    if ($null -eq $MetadataEntry) { throw "helper runtime metadata is missing" }
+    $MetadataReader = New-Object System.IO.StreamReader($MetadataEntry.Open())
+    try { $RuntimeMetadata = $MetadataReader.ReadToEnd() | ConvertFrom-Json }
+    finally { $MetadataReader.Dispose() }
     $DexEntry = $Archive.GetEntry("classes.dex")
     if ($null -eq $DexEntry) { throw "helper APK is missing classes.dex" }
     if ($null -ne ($Archive.Entries | Where-Object { $_.FullName.StartsWith("classes2.dex", [System.StringComparison]::Ordinal) } | Select-Object -First 1)) {
@@ -82,10 +87,12 @@ $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.Text.Encoding]::ASCII
 )
 $Metadata = [ordered]@{
-    helper_version = "0.1.0"
-    jadx_version = "1.5.1"
-    min_android_api = 26
-    entrypoint = "com.nl2sh.jadx.Main"
+    helper_version = $RuntimeMetadata.helper_version
+    jadx_version = $RuntimeMetadata.jadx_version
+    protocol = $RuntimeMetadata.protocol
+    features = $RuntimeMetadata.features
+    min_android_api = $RuntimeMetadata.min_android_api
+    entrypoint = $RuntimeMetadata.entrypoint
     sha256 = $Hash
     size_bytes = (Get-Item -LiteralPath $Jar).Length
 } | ConvertTo-Json

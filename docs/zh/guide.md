@@ -6,7 +6,7 @@
 
 Wrapper 验证 Gradle 发行包摘要；重封装条目顺序、时间戳与压缩方式固定。两个入口输出 dist/jadx-helper.jar、摘要和 metadata.json，dist 不提交。分发时附适用 JADX 和依赖许可证。
 
-已验证 API35 x86_64 模拟器和 API28 ARMv7 单类反编译；API26 真机、大型 multidex、内存峰值与超时清理需扩展覆盖。固定 v1.0.4 资产摘要见 [用户工具指南](https://nl2sh.github.io/nl2sh/tools/apk-jadx/)。手工 app_process 必须提供私有可写临时目录：
+已验证 API35 x86_64、API28 ARMv7 和 API26 x86_64 ART 的单类反编译；大型 multidex、内存峰值与超时清理需扩展覆盖。原生发布通过认证的兼容性 Manifest 选择 helper，不再默认使用历史 v1.0.4 资产。未签名的本地源码构建可显式指定离线 DEX helper，或提供自定义 HTTPS 地址与用户指定的 SHA-256。获取与反编译仍须强确认。手工 app_process 必须提供私有可写临时目录：
 
 ```bash
 CLASSPATH=/data/local/tmp/jadx-helper.jar /system/bin/app_process   -Djava.io.tmpdir=/data/local/tmp/jadx-work / com.nl2sh.jadx.Main APK CLASS OUTPUT
@@ -14,7 +14,7 @@ CLASSPATH=/data/local/tmp/jadx-helper.jar /system/bin/app_process   -Djava.io.tm
 
 以上路径是设备路径，先创建自己的私有工作目录；不要使用常规 JVM JAR 替代 DEX JAR。
 
-可复现摘要比较须使用同一 Git revision 与固定工具链：APK 包含 AGP 的 Git revision 元数据，提取模块历史会改变此元数据，因此独立工程重建的 JAR 不一定与历史 nl2sh `v1.0.4` 摘要相同。运行时继续保留历史固定资产，使用另一个经过验证的版本需显式选择。
+可复现摘要比较须使用同一 Git revision 与固定工具链：APK 包含 AGP 的 Git revision 元数据，提取模块历史会改变此元数据，因此独立工程重建的 JAR 不一定与历史 nl2sh `v1.0.4` 摘要相同。构建包含 `assets/nl2sh-runtime.json`；打包脚本从它生成 `metadata.json`，添加实际摘要与大小。运行时 `--info` 与资产元数据共享构建版本和协议字段，标签发布显式设置版本。原生主发布使用其信任根为汇总的 JAR 签名。
 
 ## 入口契约与失败处理
 

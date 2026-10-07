@@ -40,7 +40,7 @@ public final class Main {
 
     public static void main(String[] args) {
         if (args.length == 1 && "--info".equals(args[0])) {
-            System.out.println("{\"protocol\":1,\"helper_version\":\""
+            System.out.println("{\"protocol\":" + BuildConfig.HELPER_PROTOCOL_VERSION + ",\"helper_version\":\""
                     + BuildConfig.VERSION_NAME + "\",\"jadx_core\":\""
                     + BuildConfig.JADX_VERSION
                     + "\",\"features\":[\"single_class\",\"inner_classes\"]}");
