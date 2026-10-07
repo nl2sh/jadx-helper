@@ -5,6 +5,8 @@ plugins {
     id("com.android.application")
 }
 
+val jadxVersion = "1.5.1"
+
 android {
     namespace = "com.nl2sh.jadx"
     compileSdk = 35
@@ -16,7 +18,10 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         multiDexEnabled = false
+        buildConfigField("String", "JADX_VERSION", "\"$jadxVersion\"")
     }
+
+    buildFeatures { buildConfig = true }
 
     buildTypes {
         release {
@@ -35,8 +40,8 @@ android {
 }
 
 dependencies {
-    implementation("io.github.skylot:jadx-core:1.5.1")
-    implementation("io.github.skylot:jadx-dex-input:1.5.1")
+    implementation("io.github.skylot:jadx-core:$jadxVersion")
+    implementation("io.github.skylot:jadx-dex-input:$jadxVersion")
 }
 
 tasks.register<Zip>("packageHelper") {

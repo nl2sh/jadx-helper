@@ -21,3 +21,14 @@ Invoke `com.nl2sh.jadx.Main` with exactly three arguments: input APK, original f
 | 5 | Loading, decompilation or file writing raised an exception; inspect stderr |
 
 These codes describe the helper itself. Native nl2sh applies its own timeout and bounded output handling. A manual `app_process` invocation does not pass through nl2sh approval or inherit its bounds; use the native tool for the normal Agent workflow. For a missing class, verify its original name rather than its display/deobfuscated alias. A DEX/JAR loading error requires checking the artifact format and device compatibility; a temporary-directory error requires a private writable directory.
+
+## Runtime information
+
+`CLASSPATH=/data/local/tmp/jadx-helper.jar /system/bin/app_process / com.nl2sh.jadx.Main --info`
+returns one JSON object with `protocol: 1`, the build's `helper_version`, pinned `jadx_core`, and
+`features: ["single_class", "inner_classes"]`. It exits successfully without opening an APK or
+writing files. Clients must reject unsupported protocol versions before decompilation. SHA-256
+and DEX validation remain required; runtime information does not authenticate downloaded code.
+
+Protocol 1 `--info`, SHA-256 and the existing three-argument single-class entrypoint passed
+on API 26 x86_64 ART. `./build-helper.sh` and `./gradlew --no-daemon :app:lintRelease` passed.

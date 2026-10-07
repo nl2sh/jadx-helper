@@ -20,8 +20,6 @@ import jadx.api.security.impl.JadxSecurity;
 
 /** Small ART entrypoint for one-class JADX decompilation. */
 public final class Main {
-    private static final IJadxSecurity CLASS_ONLY_SECURITY = new ClassOnlySecurity();
-
     private Main() {
     }
 
@@ -41,8 +39,15 @@ public final class Main {
     }
 
     public static void main(String[] args) {
+        if (args.length == 1 && "--info".equals(args[0])) {
+            System.out.println("{\"protocol\":1,\"helper_version\":\""
+                    + BuildConfig.VERSION_NAME + "\",\"jadx_core\":\""
+                    + BuildConfig.JADX_VERSION
+                    + "\",\"features\":[\"single_class\",\"inner_classes\"]}");
+            return;
+        }
         if (args.length != 3) {
-            System.err.println("usage: Main <apk> <class-name> <output-java>");
+            System.err.println("usage: Main --info | <apk> <class-name> <output-java>");
             System.exit(2);
             return;
         }
@@ -53,7 +58,7 @@ public final class Main {
         jadxArgs.setSkipResources(true);
         jadxArgs.setThreadsCount(1);
         jadxArgs.setCodeCache(new NoOpCodeCache());
-        jadxArgs.setSecurity(CLASS_ONLY_SECURITY);
+        jadxArgs.setSecurity(new ClassOnlySecurity());
         jadxArgs.setDecompilationMode(DecompilationMode.SIMPLE);
         jadxArgs.setUseImports(false);
         jadxArgs.setDebugInfo(false);

@@ -29,3 +29,13 @@ CLASSPATH=/data/local/tmp/jadx-helper.jar /system/bin/app_process   -Djava.io.tm
 | 5 | 加载、反编译或文件写入抛出异常；查看 stderr |
 
 这些退出码属于 helper 自身，原生 nl2sh 另行提供超时和有界输出处理。手工 `app_process` 调用不经过 nl2sh 审批，也不继承其限制；正常 Agent 工作流应使用原生工具。找不到类时核对原始类名，而非展示或反混淆别名；DEX/JAR 加载失败时检查产物格式和设备兼容性；临时目录错误时提供私有可写目录。
+
+## 运行时版本信息
+
+`CLASSPATH=/data/local/tmp/jadx-helper.jar /system/bin/app_process / com.nl2sh.jadx.Main --info`
+返回一行 JSON：`protocol: 1`、构建版本 `helper_version`、固定依赖版本 `jadx_core` 以及
+`features: ["single_class", "inner_classes"]`。此调用成功退出，不打开 APK、不写入文件。
+客户端应在反编译前拒绝不支持的协议版本。仍需进行 SHA-256 和 DEX 校验；版本信息不能认证下载代码。
+
+协议 1 的 `--info`、SHA-256 和原有三参数单类反编译入口通过 API 26 x86_64 ART 验证；
+`./build-helper.sh` 与 `./gradlew --no-daemon :app:lintRelease` 通过。
